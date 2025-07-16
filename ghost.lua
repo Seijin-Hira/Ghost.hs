@@ -1,3 +1,9 @@
+tParams.new()
+    RayParams.FilterType = Enum.RaycastFilterType.Exclude
+    RayParams.FilterDescendantsInstances = {LocalPlayer.Character}
+    local Result = workspace:Raycast(Source.Position, Target.Position - Source.Position, RayParams)
+    return Result and Result.Instance.CanCollide
+end
 -- // Serviços
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -39,7 +45,36 @@ MainFrame.BorderSizePixel = 0
 MainFrame.ClipsDescendants = true
 MainFrame.Draggable = true
 MainFrame.Active = true
+MainFrame.Visible = true -- Visível por padrão
 MainFrame.Parent = ScreenGui
+
+-- // Botão Mobile (Canto Superior Esquerdo)
+local MobileButton = Instance.new("TextButton")
+MobileButton.Name = "MobileMenuButton"
+MobileButton.Text = "MENU"
+MobileButton.Font = Enum.Font.SourceSansBold
+MobileButton.TextSize = 18
+MobileButton.Size = UDim2.new(0, 100, 0, 30)
+MobileButton.Position = UDim2.new(0, 10, 0, 10)
+MobileButton.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+MobileButton.TextColor3 = Color3.new(1, 1, 1)
+MobileButton.BorderSizePixel = 0
+MobileButton.Visible = false -- Começa invisível até detectar mobile
+MobileButton.ZIndex = 10
+MobileButton.AutoButtonColor = true
+MobileButton.Parent = ScreenGui
+
+-- // Detecta dispositivo móvel
+spawn(function()
+    if UserInputService.TouchEnabled then
+        MobileButton.Visible = true
+    end
+end)
+
+-- // Função de abrir/fechar menu ao clicar no botão mobile
+MobileButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
 
 -- // Botão de Fechar
 local CloseButton = Instance.new("TextButton")
@@ -54,7 +89,7 @@ CloseButton.BorderSizePixel = 0
 CloseButton.Parent = MainFrame
 
 CloseButton.MouseButton1Down:Connect(function()
-    ScreenGui.Enabled = not ScreenGui.Enabled
+    MainFrame.Visible = false
 end)
 
 -- // Tabs
@@ -308,7 +343,6 @@ FlyButton.MouseButton1Click:Connect(function()
     FlyEnabled = not FlyEnabled
     FlyButton.Text = "Voar: " .. (FlyEnabled and "Ativado" or "Desativado")
     if FlyEnabled then
-        -- Implementação de Voar aqui
         print("Voar ativado!")
     end
 end)
@@ -403,7 +437,7 @@ spawn(function()
     while wait(5) do
         game:GetService("StarterGui"):SetCore("SendNotification", {
             Title = "Universal Script",
-            Text = "Menu carregado! Pressione X para abrir/fechar.",
+            Text = "Menu carregado! Pressione X ou toque no botão para abrir.",
             Duration = 5,
         })
     end
